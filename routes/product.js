@@ -1,16 +1,57 @@
 const express = require("express");
 const router = express.Router();
 
-const Product = require("../models/product");
-const Department = require("../models/department");
-const Category = require("../models/category");
+const Product = require("../models/Product");
+const Department = require("../models/Department");
+const Category = require("../models/Category");
 
-// PRODUCT ###############################################################
+// READ ########################################
+
+const createFilters = req => {
+  const filters = {};
+
+  if (req.query.priceMin) {
+    filters.price = {};
+    filters.price.$gte = req.query.priceMin;
+  }
+  if (req.query.priceMax) {
+    if (filters.price === undefined) {
+      filters.price = {};
+    }
+    filters.price.$lte = req.query.priceMax;
+  }
+  if (req.query.category) {
+    filters.category = req.query.category;
+  }
+  if (req.query.title) {
+    filters.title = new RegExp(req.query.title, "i");
+  }
+  return filters;
+};
 
 router.get("/product", async (req, res) => {
-  let allProd = await Product.find().populate("category");
-  res.json(allProd);
+  const filters = createFilters(req);
+
+  // Ici, nous construisons notre recherche
+  const search = Product.find(filters);
+
+  if (req.query.sort === "rating-asc") {
+    search.sort({ averageRating: 1 });
+  } else if (req.query.sort === "rating-desc") {
+    search.sort({ averageRating: -1 });
+  } else if (req.query.sort === "price-asc") {
+    // Ici, nous continuons de construire notre recherche
+    search.sort({ price: 1 });
+  } else if (req.query.sort === "price-desc") {
+    // Ici, nous continuons de construire notre recherche
+    search.sort({ price: -1 });
+  }
+
+  const products = await search;
+  res.json(products);
 });
+
+// CREATE ########################################
 
 router.post("/product/create", async (req, res) => {
   let title = req.body.title;
@@ -33,6 +74,8 @@ router.post("/product/create", async (req, res) => {
   }
 });
 
+// UPDATE ########################################
+
 router.post("/product/update", async (req, res) => {
   let id = req.query.id;
   let title = req.body.title;
@@ -40,6 +83,7 @@ router.post("/product/update", async (req, res) => {
   let price = req.body.price;
   let categoryId = req.body.category;
   let prodToUpdate = await Product.findById(id);
+
   if (title) {
     prodToUpdate.title = title;
   }
@@ -56,10 +100,9 @@ router.post("/product/update", async (req, res) => {
   res.json(prodToUpdate);
 });
 
-// router.post("/product/delete", async (req, res) => {
-//     let id = req.query.id;
-//     let prodToDelete = await Product.findById(id);
-//     // in progress
-//   });
+// DELETE ########################################
+
+// Voir la route department/delete
+// Même principe
 
 module.exports = router;
