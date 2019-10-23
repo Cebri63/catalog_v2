@@ -1,19 +1,17 @@
 const express = require("express");
 const router = express.Router();
 
-const Product = require("../models/product");
-const Department = require("../models/department");
-const Category = require("../models/category");
+const Product = require("../models/Product");
+const Department = require("../models/Department");
+const Category = require("../models/Category");
 
-// CATEGORY ###############################################################
-
-// READ
+// READ ###############################################################
 router.get("/category", async (req, res) => {
   let allCat = await Category.find().populate("department");
   res.json(allCat);
 });
 
-// CREATE
+// CREATE ###############################################################
 router.post("/category/create", async (req, res) => {
   let title = req.body.title;
   let description = req.body.description;
@@ -33,7 +31,7 @@ router.post("/category/create", async (req, res) => {
   }
 });
 
-// UPDATE
+// UPDATE ###############################################################
 router.post("/category/update", async (req, res) => {
   let id = req.query.id;
   let title = req.body.title;
@@ -53,11 +51,8 @@ router.post("/category/update", async (req, res) => {
   res.json(catToUpdate);
 });
 
-// DELETE
-// router.post("/category/delete", async (req, res) => {
-//     let id = req.query.id;
-//     let catToDelete = await Category.findById(id);
-//     // in progress
-//   });
+// DELETE ###############################################################
+// Voir la route department/delete
+// Même principe
 
 module.exports = router;
