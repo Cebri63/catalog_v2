@@ -63,7 +63,6 @@ router.post("/department/delete", async (req, res) => {
       await categories[i].remove();
     }
 
-    // await categories.remove();
     res.json({ message: "Department removed" });
   } else {
     res.status(400).json({

@@ -33,7 +33,7 @@ router.get("/product", async (req, res) => {
   const filters = createFilters(req);
 
   // Ici, nous construisons notre recherche
-  const search = Product.find(filters);
+  const search = Product.find(filters).populate("category");
 
   if (req.query.sort === "rating-asc") {
     search.sort({ averageRating: 1 });
@@ -45,6 +45,16 @@ router.get("/product", async (req, res) => {
   } else if (req.query.sort === "price-desc") {
     // Ici, nous continuons de construire notre recherche
     search.sort({ price: -1 });
+  }
+
+  // limit : le nombre de résultats affichés
+  // skip : Ignorer les X premiers
+
+  if (req.query.page) {
+    const page = req.query.page;
+    const limit = 4;
+
+    search.limit(limit).skip(limit * (page - 1));
   }
 
   const products = await search;
