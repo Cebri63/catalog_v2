@@ -112,7 +112,20 @@ router.post("/product/update", async (req, res) => {
 
 // DELETE ########################################
 
-// Voir la route department/delete
-// Même principe
+router.post("/product/delete", async (req, res) => {
+  let id = req.query.id;
+  let prodToDelete = await Category.findById(id);
+
+  if (prodToDelete) {
+    // suppression de la categorie
+    prodToDelete.remove();
+
+    res.json({ message: "Product removed" });
+  } else {
+    res.status(400).json({
+      message: "Product not found"
+    });
+  }
+});
 
 module.exports = router;

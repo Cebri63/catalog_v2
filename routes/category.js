@@ -52,7 +52,29 @@ router.post("/category/update", async (req, res) => {
 });
 
 // DELETE ###############################################################
-// Voir la route department/delete
-// Même principe
+
+router.post("/category/delete", async (req, res) => {
+  let id = req.query.id;
+  let catToDelete = await Category.findById(id);
+
+  if (catToDelete) {
+    // suppression de la categorie
+    catToDelete.remove();
+
+    // supprimer aussi les produits
+    const products = await Product.find({
+      category: req.query.id
+    });
+    for (let i = 0; i < products.length; i++) {
+      await products[i].remove();
+    }
+
+    res.json({ message: "Category removed" });
+  } else {
+    res.status(400).json({
+      message: "Category not found"
+    });
+  }
+});
 
 module.exports = router;
